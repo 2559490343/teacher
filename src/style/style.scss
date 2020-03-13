@@ -1,0 +1,282 @@
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+.el-header {
+  padding: 0 !important;
+}
+
+// .el-scrollbar {
+//   // overflow: unset !important;
+// }
+
+.el-button--primary {
+  color: #FFFFFF;
+  background-color: #333;
+  border-color: #333;
+}
+
+.my_table {
+  border: 1px solid #E5E8ED;
+  border-bottom: 0;
+
+  table {
+    tr {
+
+      td {
+        .cell {
+          max-height: 69px;
+          /* 主要代码 */
+          overflow: hidden;
+          position: relative;
+
+          div {
+            color: #333333;
+            font-size: 14px;
+          }
+        }
+      }
+
+    }
+  }
+
+  //预览图片的样式
+  .el-image-viewer__canvas img {
+    width: auto;
+    height: auto;
+  }
+
+  //表格头部
+  .el-table__header-wrapper {
+    background-color: #F5F6FA;
+  }
+
+  .el-table__header-wrapper table thead tr th {
+    background-color: #F5F6FA;
+  }
+
+  //带链接的
+  .name-link {
+    font-size: 14px;
+    color: #117EFF;
+  }
+
+  .name-link:hover {
+    color: #117EFF;
+  }
+
+  //超出带省略号的
+  .ellipsis-text {
+    display: inline-block;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle
+  }
+
+  .el-icon-edit-outline {
+    display: none;
+    cursor: pointer;
+    color: #117EFF;
+  }
+
+  .el-table__row td:hover .el-icon-edit-outline {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+.input_width {
+  width: 300px !important;
+}
+
+// 页头样式
+.el-page-header {
+  height: 56px;
+  border-bottom: 1px solid #ECF0F5;
+  display: flex;
+  align-items: center;
+
+  .el-page-header__left {
+    width: 30px;
+    height: 24px;
+    overflow: hidden;
+    border: 1px solid #DCDFE6;
+    margin-right: 12px;
+    padding: 5px;
+    box-sizing: border-box;
+    margin-left: 20px;
+    color: #C3C8D6;
+
+    .el-page-header__title {
+      display: none;
+
+    }
+
+    .el-icon-back:before {
+      content: '\E6DE';
+    }
+
+    .el-icon-back:after {
+      content: '\E6DE';
+    }
+  }
+
+  .el-page-header__content {
+    font-size: 16px;
+    color: #333333;
+  }
+}
+
+.el-button--primary {
+  color: #FFFFFF !important;
+  background-color: #333 !important;
+  border-color: #333 !important;
+}
+
+.el-button--primary:hover,
+.el-button--primary:active,
+.el-button--primary:focus {
+  background-color: #333 !important;
+  border-color: #333 !important;
+  opacity: 0.8 !important;
+}
+
+.title {
+  height: 56px;
+  border-bottom: 1px solid #ECF0F5;
+  display: flex;
+  padding: 0 20px;
+  align-items: center;
+  justify-content: space-between;
+
+  label {
+    line-height: 34px;
+    font-size: 14px;
+    color: #606266;
+  }
+
+
+
+}
+
+.content {
+  padding: 20px;
+}
+
+/*  小菊花样式 */
+.el-loading-mask .el-loading-spinner i,
+.el-loading-mask .el-loading-spinner p {
+  color: #fff;
+}

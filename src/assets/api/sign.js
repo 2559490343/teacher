@@ -4,13 +4,17 @@ const api = {
     addSign: (params) => {
         return req.apiAxios("POST", '/api/course/checkcode', params)
     },
+    // 删除签到
+    delSign: (params) => {
+        return req.apiAxios("POST", '/api/course/delsign', params)
+    },
     // 获取签到列表
     getSignList: (params) => {
-        return req.apiAxios("POST", '/api/course/allsign' , params)
+        return req.apiAxios("POST", '/api/course/allsign', params)
     },
     // 查询签到详情
-    getSignDetail:(params)=>{
-        return req.apiAxios('POST','/api/course/signdetail',params)
+    getSignDetail: (params) => {
+        return req.apiAxios('POST', '/api/course/signdetail', params)
     }
 }
 

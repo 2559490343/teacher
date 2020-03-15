@@ -187,6 +187,10 @@ export default {
     addHomeWork() {
       let homeworkTime = this.common.formatDateTime(new Date());
       let list = [...this.question_list];
+      if (list.length == 0) {
+        this.$message.warning("题目数量不能为0！");
+        return;
+      }
       let obj = {
         courseId: this.courseId,
         homeworkType: this.homeworkType,

@@ -21,6 +21,7 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="edit">修改信息</el-dropdown-item>
+          <el-dropdown-item command="pwd">修改密码</el-dropdown-item>
           <el-dropdown-item command="exit">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -34,7 +35,6 @@ export default {
   data() {
     return {
       title: "",
-      teacherName: "",
       courseList: [],
       termList: [],
       dialogVisible: false,
@@ -46,19 +46,21 @@ export default {
   watch: {
     $route(to, from) {
       this.title = to.meta.title ? to.meta.title : "课堂辅助系统";
-      console.log(to.meta.title);
+      // console.log(to.meta.title);
     }
   },
   computed: {
     courseName() {
       return this.$store.state.courseName;
+    },
+    teacherName() {
+      return this.$store.state.teacherName;
     }
   },
   created() {
     this.title = this.$route.meta.title
       ? this.$route.meta.title
       : "课堂辅助系统";
-    this.teacherName = sessionStorage.getItem('teacherName')
   },
   methods: {
     showChangeCourse() {
@@ -66,12 +68,18 @@ export default {
     },
     handleCommand(command) {
       if (command === "exit") {
-        this.$router.push({ name: "login" });
         sessionStorage.clear();
+        this.$router.push({ name: "login" });
+        // sessionStorage.removeItem('token')
         // this.$store.dispatch("setLoginStatus", false); // 设置isRouterAlive为false
-        location.reload(); // 为了重新实例化vue-router对象 避免bug
-      }else if(command ==='edit'){
+        // location.reload(); // 为了重新实例化vue-router对象 避免bug
+        this.$store.dispatch("setCourseName", "");
+        this.$store.dispatch("setCourseId", "");
+        this.$store.dispatch("setTeacherName", "");
+      } else if (command === "edit") {
         this.$store.dispatch("setEditInfo", true);
+      } else if (command === "pwd") {
+        this.$store.dispatch("setEditPwd", true);
       }
     }
   }

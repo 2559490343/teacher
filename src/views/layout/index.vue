@@ -16,6 +16,7 @@
             <router-view></router-view>
             <changeCourse :show="changeCourse"></changeCourse>
             <editInfo :show="editInfo"></editInfo>
+            <editPwd :show="editPwd"></editPwd>
           </div>
         </el-main>
       </el-container>
@@ -31,12 +32,14 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import myHeader from "@/components/myHeader.vue";
 import changeCourse from "@/components/changeCourse.vue";
 import editInfo from "@/components/editInfo.vue";
+import editPwd from "@/components/editPwd.vue";
 export default {
   components: {
     Sidebar,
     myHeader,
     changeCourse,
-    editInfo
+    editInfo,
+    editPwd
   },
   data() {
     return {
@@ -49,6 +52,9 @@ export default {
     },
     editInfo() {
       return this.$store.state.editInfo;
+    },
+    editPwd() {
+      return this.$store.state.editPwd;
     }
   },
   created() {

@@ -79,7 +79,11 @@ export default {
     },
     // 获取某个学期的课程列表
     getCourse() {
-      this.api.getCourse(this.termId).then(res => {
+      let obj = {
+        termId: this.termId
+      };
+      let str = JSON.stringify(obj);
+      this.api.getCourse(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;

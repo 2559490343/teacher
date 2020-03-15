@@ -4,6 +4,10 @@ const api = {
     addHomeWork: (params) => {
         return req.apiAxios("POST", '/api/homework/addhomework', params)
     },
+    //删除作业
+    delHomework:(params)=>{
+        return req.apiAxios("POST",'/api/homework/delhomework',params)
+    },
     // 获取作业列表
     getHomeWorkList:(params)=>{
         return req.apiAxios('POST','/api/homework/allhomework',params)

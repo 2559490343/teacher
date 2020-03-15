@@ -173,11 +173,15 @@ export default {
         console.log(res);
         if (res.code !== 0) return;
         this.$message.success("题目上传成功");
+        this.question_list = [];
+        this.importList = [];
+        // this.form = {};
         this.goBack();
       });
     },
     goBack() {
       this.$router.push({ name: "question_list" });
+      location.reload()
     },
     // 操作题目
     optQuestion() {
@@ -200,17 +204,16 @@ export default {
             titleType = "选择题";
             break;
         }
-
-        let obj = Object.assign({}, this.form, { titleType });
-        let list = [];
-        list.push(obj);
-        let str = JSON.stringify(list);
-        this.api.importQuestions(str).then(res => {
-          console.log(res);
-          if (res.code !== 0) return;
-          this.$message.success("题目上传成功");
-          // this.goBack();
+        this.question_list[parseInt(this.question_type)].push(
+          Object.assign({}, this.form, { titleType })
+        );
+        this.importList = [];
+        this.question_list.forEach(item => {
+          this.importList = this.importList.concat(item);
         });
+        this.$message.success("题目已添加!");
+        this.dialogVisible = false;
+        this.form = {};
       } else {
         this.question_list[parseInt(this.question_type)].splice(
           this.index,
@@ -219,6 +222,10 @@ export default {
         );
         this.dialogVisible = false;
         this.$message("修改题目成功");
+        this.importList = [];
+        this.question_list.forEach(item => {
+          this.importList = this.importList.concat(item);
+        });
         this.form = {};
       }
     },
@@ -232,6 +239,10 @@ export default {
       })
         .then(() => {
           this.question_list[parseInt(this.question_type)].splice(index, 1);
+          this.importList = [];
+          this.question_list.forEach(item => {
+            this.importList = this.importList.concat(item);
+          });
         })
         .catch(() => {
           return;

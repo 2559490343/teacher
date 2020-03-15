@@ -22,7 +22,7 @@
         <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="editTitle(scope.row.titleId)">编辑</el-button>
+            <el-button type="text" @click="showEdit(scope.row)">编辑</el-button>
             <el-button type="text" @click="deleteTitle(scope.row.titleId)" style="color:#f56c6c">删除</el-button>
           </template>
         </el-table-column>
@@ -33,7 +33,7 @@
         <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="editTitle(scope.row.titleId)">编辑</el-button>
+            <el-button type="text" @click="showEdit(scope.row)">编辑</el-button>
             <el-button type="text" @click="deleteTitle(scope.row.titleId)" style="color:#f56c6c">删除</el-button>
           </template>
         </el-table-column>
@@ -45,9 +45,34 @@
       width="30%"
       @close="dialogVisible = false"
     >
+      <div class="inner">
+        <el-form :model="form" ref="form" label-width="80px">
+          <el-form-item label="题目">
+            <el-input v-model="form.titleName" class="input_width"></el-input>
+          </el-form-item>
+          <el-form-item label="选项A" v-if="question_type == '选择题'">
+            <el-input v-model="form.titleA" class="input_width"></el-input>
+          </el-form-item>
+          <el-form-item label="选项B" v-if="question_type == '选择题'">
+            <el-input v-model="form.titleB" class="input_width"></el-input>
+          </el-form-item>
+          <el-form-item label="选项C" v-if="question_type == '选择题'">
+            <el-input v-model="form.titleC" class="input_width"></el-input>
+          </el-form-item>
+          <el-form-item label="选项D" v-if="question_type == '选择题'">
+            <el-input v-model="form.titleD" class="input_width"></el-input>
+          </el-form-item>
+          <el-form-item label="答案" v-if="question_type == '简答题'">
+            <el-input type="textarea" v-model="form.titleAnswer" class="input_width"></el-input>
+          </el-form-item>
+          <el-form-item label="答案" v-else>
+            <el-input v-model="form.titleAnswer" class="input_width"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
       <span slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = true">确 定</el-button>
+        <el-button type="primary" @click="editTitle">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -59,22 +84,44 @@ export default {
       question_list: [],
       question_type: "选择题",
       dialogVisible: false,
-      type: true //切换是否为选择题类型
+      type: true, //切换是否为选择题类型
+      form: {}
     };
   },
   created() {
     this.getQuestions();
   },
   methods: {
-    editTitle(titleId) {},
+    // 显示修改题目的弹窗
+    showEdit(title) {
+      this.form = Object.assign({}, title);
+      this.dialogVisible = true;
+    },
+    // 提交修改
+    editTitle() {
+      let str = JSON.stringify(this.form);
+      this.api.editTitle(str).then(res => {
+        if (res.code !== 0) return;
+        this.$message.success("题目修改成功!");
+        this.dialogVisible = false;
+        this.getQuestions();
+      });
+    },
+    // 删除题目
     deleteTitle(titleId) {
-       this.$confirm("确定要删除此题目吗？", "提示", {
+      this.$confirm("确定要删除此题目吗？", "提示", {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
+          let obj = { titleId };
+          let str = JSON.stringify(obj);
+          this.api.delTitle(str).then(res => {
+            if (res.code !== 0) return;
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            this.getQuestions();
           });
         })
         .catch(() => {
@@ -83,7 +130,11 @@ export default {
     },
     // 按类型获取题目列表
     getQuestions() {
-      let obj = { titleType: this.question_type };
+      let a = {
+        pageSize: 1,
+        pageNum: 2
+      };
+      let obj = { titleType: this.question_type, ...a };
       let str = JSON.stringify(obj);
       this.api.getQuestions(str).then(res => {
         console.log(res);

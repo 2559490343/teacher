@@ -63,6 +63,15 @@
 <script>
 export default {
   data() {
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入迟到时间"));
+      } else if (value > this.form.truancyTime) {
+        callback(new Error("迟到时间不能大于签到持续时长!"));
+      } else {
+        callback();
+      }
+    };
     return {
       sign_list: [],
       dialogVisible: false,
@@ -75,7 +84,8 @@ export default {
         title: [{ required: true, message: "请输入签到主题", trigger: "blur" }],
         lateTime: [
           { required: true, message: "请输入迟到时间", trigger: "blur" },
-          { type: "number", message: "时长为数字值" }
+          { type: "number", message: "时长为数字值" },
+          { validator: validatePass2, trigger: "blur" }
         ],
         truancyTime: [
           { required: true, message: "请输入签到持续时长", trigger: "blur" },
@@ -99,9 +109,15 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
+          let obj = { signId };
+          let str = JSON.stringify(obj);
+          this.api.delSign(str).then(res => {
+            if (res.code !== 0) return;
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            this.getSignList();
           });
         })
         .catch(() => {
@@ -156,7 +172,7 @@ export default {
     // 获取签到列表
     getSignList() {
       let obj = {
-        openId: "2",
+        openId: "1",
         sign: {
           courseId: this.courseId
         }
@@ -176,11 +192,11 @@ export default {
 };
 </script>
 <style lang="scss">
-.signList {
-  .el-dialog__wrapper {
-    input {
-      // width: 250px;
-    }
-  }
-}
+// .signList {
+//   // .el-dialog__wrapper {
+//   //   // input {
+//   //   //   // width: 250px;
+//   //   // }
+//   // }
+// }
 </style>

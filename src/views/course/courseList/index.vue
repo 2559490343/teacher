@@ -176,9 +176,19 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
+          let obj = {
+            courseId
+          };
+          let str = JSON.stringify(obj);
+          this.api.delCourse(str).then(res => {
+            if (res.code !== 0) return;
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            this.getCourse();
+            this.$store.dispatch("setCourseName", "");
+            this.$store.dispatch("setCourseId", "");
           });
         })
         .catch(() => {
@@ -194,9 +204,20 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!"
+          let obj = {
+            termId
+          };
+          let str = JSON.stringify(obj);
+          this.api.delTerm(str).then(res => {
+            console.log(res);
+            if (res.code !== 0) return;
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            this.getTerm();
+            this.$store.dispatch("setCourseName", "");
+            this.$store.dispatch("setCourseId", "");
           });
         })
         .catch(() => {
@@ -220,15 +241,19 @@ export default {
         if (res.code !== 0) return;
         let list = res.data || [];
         this.term_list = list;
-        this.term = list.length ?list[0].termId:'';
+        this.term = list.length ? list[0].termId : "";
         this.termId = list.length ? list[0].termId : "";
         this.getCourse();
       });
     },
     // 获取某个学期的课程列表
     getCourse() {
-      if(!this.termId) return
-      this.api.getCourse(this.termId).then(res => {
+      if (!this.termId) return;
+      let obj = {
+        termId: this.termId
+      };
+      let str = JSON.stringify(obj);
+      this.api.getCourse(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;

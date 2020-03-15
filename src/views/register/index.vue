@@ -7,11 +7,11 @@
 
     <div class="right-box">
       <div class="tit">用户注册</div>
-      <el-form>
-        <el-form-item>
+      <el-form :model="params" :rules="rules" ref="ruleForm">
+        <el-form-item prop="teacherEmail">
           <el-input placeholder="请输入邮箱" prefix-icon="el-icon-user" v-model="params.teacherEmail"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="teacherPassword">
           <el-input
             placeholder="请输入密码"
             prefix-icon="el-icon-unlock"
@@ -19,7 +19,7 @@
             show-password
           ></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="passwordConfirm">
           <el-input
             placeholder="请确认密码"
             prefix-icon="el-icon-unlock"
@@ -27,15 +27,15 @@
             show-password
           ></el-input>
         </el-form-item>
-        <el-form-item class="sendCode">
+        <el-form-item class="sendCode" prop="teacherCode">
           <el-input placeholder="验证码" prefix-icon="el-icon-unlock" v-model="params.teacherCode"></el-input>
           <span @click="sendCode" class="send_btn" v-if="send_flag">发送验证码</span>
           <span class="send_btn wait" v-else>{{countdown}}s后再次发送</span>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="teacherName">
           <el-input placeholder="您的姓名" prefix-icon="el-icon-unlock" v-model="params.teacherName"></el-input>
         </el-form-item>
-        <el-button type="primary" class="login-btn" @click="handleRegister">注册</el-button>
+        <el-button type="primary" class="login-btn" @click="submitForm('ruleForm')">注册</el-button>
       </el-form>
       <p class="toLogin">
         已有账号？
@@ -50,6 +50,15 @@ import md5 from "js-md5";
 export default {
   name: "login",
   data() {
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.params.teacherPassword) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       loginKey: null,
       loading: false,
@@ -60,6 +69,36 @@ export default {
         teacherCode: null,
         teacherName: null
       },
+      rules: {
+        teacherEmail: [
+          { required: true, message: "请输入邮箱地址", trigger: "blur" },
+          {
+            type: "email",
+            message: "请输入正确的邮箱地址",
+            trigger: ["blur", "change"]
+          }
+        ],
+        teacherPassword: [
+          { required: true, message: "请输入密码", trigger: "blur" }
+        ],
+        passwordConfirm: [
+          {
+            required: true,
+            message: "请再次输入密码",
+            trigger: "blur"
+          },
+          {
+            validator: validatePass2,
+            trigger: "blur"
+          }
+        ],
+        teacherCode: [
+          { required: true, message: "请输入验证码", trigger: "blur" }
+        ],
+        teacherName: [
+          { required: true, message: "请输入您的名字", trigger: "blur" }
+        ]
+      },
       redirect: "",
       countdown: 59, //验证码发送倒计时
       send_flag: true //验证码发送按钮切换flag
@@ -67,17 +106,26 @@ export default {
   },
   created() {},
   methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.handleRegister();
+        } else {
+          return false;
+        }
+      });
+    },
     handleRegister() {
       let password = md5(this.params.teacherPassword);
       this.params.teacherPassword = password;
       let str = JSON.stringify(this.params);
       this.api.register(str).then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.code !== 0) return;
         this.$message.success("注册成功！");
-        sessionStorage.setItem('username',this.params.teacherEmail);
+        sessionStorage.setItem("username", this.params.teacherEmail);
         setTimeout(() => {
-          this.$router.push('/login')
+          this.$router.push("/login");
         }, 1000);
       });
     },
@@ -88,7 +136,7 @@ export default {
       };
       let str = JSON.stringify(obj);
       this.api.sendCode(str).then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.code !== 0) return;
         this.$message.success("验证码已发送！");
         this.send_flag = false;

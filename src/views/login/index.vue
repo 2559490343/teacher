@@ -7,21 +7,21 @@
 
     <div class="right_box">
       <div class="tit">用户登录</div>
-      <el-form>
-        <el-form-item>
+      <el-form :model="params" :rules="rules" ref="ruleForm">
+        <el-form-item prop="teacherEmail">
           <el-input placeholder="请输入邮箱" prefix-icon="el-icon-user" v-model="params.teacherEmail"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="teacherPassword">
           <el-input
             placeholder="请输入密码"
             prefix-icon="el-icon-unlock"
             v-model="params.teacherPassword"
             show-password
-            @keyup.enter.native="handleLogin"
+            @keyup.enter.native="submitForm('ruleForm')"
           ></el-input>
         </el-form-item>
 
-        <el-button type="primary" class="login-btn" @click="handleLogin">登录</el-button>
+        <el-button type="primary" class="login-btn" @click="submitForm('ruleForm')">登录</el-button>
       </el-form>
       <p class="toRegister">
         还没有账号？
@@ -43,13 +43,43 @@ export default {
         teacherEmail: null,
         teacherPassword: null
       },
-      redirect: ""
+      redirect: "",
+      rules: {
+        teacherEmail: [
+          { required: true, message: "请输入邮箱地址", trigger: "blur" },
+          {
+            type: "email",
+            message: "请输入正确的邮箱地址",
+            trigger: ["blur", "change"]
+          }
+        ],
+        teacherPassword: [
+          { required: true, message: "请输入密码", trigger: "blur" }
+        ]
+      }
     };
+  },
+  beforeRouteEnter (to, from, next) {
+    // ...
+    if(sessionStorage.getItem('token')){
+      next('/course')
+    }else{
+      next()
+    }
   },
   created() {
     this.params.teacherEmail = sessionStorage.getItem("username") || null;
   },
   methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.handleLogin();
+        } else {
+          return false;
+        }
+      });
+    },
     handleLogin() {
       let obj = {
         teacherEmail: this.params.teacherEmail,
@@ -60,6 +90,8 @@ export default {
         // console.log(res);
         if (res.code !== 0) return;
         sessionStorage.setItem("teacherName", res.data.teacherName);
+        sessionStorage.setItem("teacherEmail", this.params.teacherEmail);
+        this.$store.dispatch("setTeacherName", res.data.teacherName);
         this.$message.success("登录成功！");
         this.$router.push("/course");
       });

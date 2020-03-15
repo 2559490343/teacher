@@ -162,7 +162,7 @@ export default {
         courseId: this.courseId
       };
       let str = JSON.stringify(obj);
-      this.api.getCourseInfo(this.courseId).then(res => {
+      this.api.getCourseInfo(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data.list || [];

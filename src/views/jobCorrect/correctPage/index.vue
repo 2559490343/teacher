@@ -39,6 +39,7 @@
             </template>
           </el-table-column>
         </el-table>
+        <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       </div>
       <div class="btns">
         <!-- <el-button type="primary" @click="submitCorrect">提交批改</el-button> -->
@@ -69,7 +70,11 @@
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       upload_list: [],
@@ -81,6 +86,11 @@ export default {
       right_counts: 0,
       studentId: "",
       studentName: "",
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
       homeworkId: ""
     };
   },
@@ -88,10 +98,14 @@ export default {
     this.studentId = this.$route.query.studentId;
     this.studentName = this.$route.query.studentName;
     this.homeworkId = this.$route.query.homeworkId;
-    this.getStudentSubmitDetail();
     this.getHomeWorkDetail();
+    // this.getStudentSubmitDetail();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getHomeWorkDetail();
+    },
     correctJob(id) {
       this.titleId = id;
       this.dialogVisible = true;
@@ -103,9 +117,11 @@ export default {
     },
     // 获取作业的题目列表
     getHomeWorkDetail() {
-      let str = JSON.stringify({
+      let obj = {
         homeworkId: this.$route.query.homeworkId
-      });
+      };
+      obj = Object.assign({}, obj, this.layerpageinfo);
+      let str = JSON.stringify(obj);
       this.api.getHomeWorkDetail(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
@@ -120,18 +136,20 @@ export default {
         studentId: this.studentId,
         homeworkId: this.homeworkId
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getStudentSubmitDetail(str).then(res => {
         console.log(res);
 
         if (res.code !== 0) return;
         let answer_list = res.data || [];
+        this.layerpageinfo.total = res.totalSize;
         if (answer_list.length) {
           this.right_counts = 0;
           for (let i = 0; i < answer_list.length; i++) {
             list[i].titleTrue = answer_list[i].titleTrue;
             list[i].submitAnswer = answer_list[i].titleAnswer;
-            list[i].titleAnswer = list[i].titleAnswer.toUpperCase();
+            // list[i].titleAnswer = list[i].titleAnswer.toUpperCase();
             if (answer_list[i].titleTrue == "true") this.right_counts++;
           }
         }

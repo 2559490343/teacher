@@ -51,6 +51,8 @@
             </template>
           </el-table-column>
         </el-table>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
+
       </div>
     </div>
 
@@ -74,12 +76,22 @@
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
+
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       rate_list: [],
       dialogVisible: false,
       submit_info: {}, //作业详情信息
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
       commits: [] //提交作业列表
     };
   },
@@ -88,6 +100,10 @@ export default {
     this.getHomeWorkDetail();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getHomeWorkSubmitDetail();
+    },
     goBack() {
       this.$router.push({ name: "correct_list" });
     },
@@ -106,11 +122,13 @@ export default {
       let obj = {
         homeworkId: this.$route.query.homeworkId
       };
+       obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getHomeWorkSubmitDetail(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         this.commits = res.data ? res.data.commits : [];
+        this.layerpageinfo.total = res.data.commitCount
       });
     },
     // 获取作业信息

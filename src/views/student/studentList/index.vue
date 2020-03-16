@@ -1,8 +1,8 @@
 <template>
   <div class="studentList">
     <div class="title">
-      <!-- <el-button type="primary" @click="addStudent">添加学生</el-button> -->
       <el-button type="primary" @click="uploadStudent">批量导入</el-button>
+      <el-button type="primary" @click="addStudent">添加单个学生</el-button>
     </div>
     <div class="content">
       <el-table :data="student_list" border stripe>
@@ -28,6 +28,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
     </div>
     <!-- 编辑学生信息 -->
     <el-dialog
@@ -83,7 +84,7 @@
       </span>
     </el-dialog>
     <!-- 添加学生 -->
-    <!-- <el-dialog
+    <el-dialog
       title="添加学生"
       :visible.sync="dialogVisible2"
       width="30%"
@@ -92,30 +93,39 @@
     >
       <div class="add">
         <el-form :model="form2" ref="form2" :rules="rules2" label-width="80px">
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="form2.name" class="input_width"></el-input>
+          <el-form-item label="姓名" prop="studentName">
+            <el-input v-model="form2.studentName" class="input_width"></el-input>
           </el-form-item>
-          <el-form-item label="学号" prop="number">
-            <el-input v-model.number="form2.number" class="input_width"></el-input>
+          <el-form-item label="学号" prop="studentNum">
+            <el-input v-model.number="form2.studentNum" class="input_width"></el-input>
           </el-form-item>
-          <el-form-item label="班级" prop="class">
+          <!-- <el-form-item label="班级" prop="class">
             <el-input v-model.number="form2.class" class="input_width"></el-input>
-          </el-form-item>
+          </el-form-item>-->
         </el-form>
       </div>
       <span slot="footer">
         <el-button @click="closeAdd">取 消</el-button>
-        <el-button type="primary" @click="submitAdd('form2')">确 定</el-button>
+        <el-button type="primary" @click="submitForm('form2')">确 定</el-button>
       </span>
-    </el-dialog>-->
+    </el-dialog>
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       dialogVisible: false,
       dialogVisible2: false,
+      layerpageinfo: {
+        pageSize: 6,
+        pageNum: 1,
+        total: 0
+      },
       student_list: [],
       form: {
         name: "",
@@ -125,18 +135,15 @@ export default {
         examGrade: null
       },
       form2: {
-        name: "",
-        class: "",
-        number: ""
+        studentName: "",
+        studentNum: ""
       },
       index: 0,
       rules2: {
-        name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
-        class: [
-          { required: true, message: "请输入班级", trigger: "blur" },
-          { type: "number", message: "班级必须为数字" }
+        studentName: [
+          { required: true, message: "请输入姓名", trigger: "blur" }
         ],
-        number: [
+        studentNum: [
           { required: true, message: "请输入学号", trigger: "blur" },
           { type: "number", message: "学号必须为数字" }
         ]
@@ -152,6 +159,39 @@ export default {
     this.getStudentList();
   },
   methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.submitUpload();
+        } else {
+          return false;
+        }
+      });
+    },
+    // 提交导入学生名单
+    submitUpload() {
+      // console.log(this.student_list);
+      let obj = {
+        courseId: this.courseId,
+        list: [this.form2]
+      };
+      let str = JSON.stringify(obj);
+      this.api.addStudentList(str).then(res => {
+        console.log(res);
+        if (res.code !== 0) return;
+        this.$message.success("导入学生成功！");
+        this.form2 = {};
+        this.dialogVisible2 = false;
+        this.getStudentList();
+      });
+    },
+    closeAdd() {
+      this.dialogVisible2 = false;
+    },
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getStudentList();
+    },
     // 修改成绩表单时强制渲染保证页面更新
     change() {
       this.$forceUpdate();
@@ -161,12 +201,14 @@ export default {
       let obj = {
         courseId: this.courseId
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getCourseInfo(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data.list || [];
         this.student_list = list;
+        this.layerpageinfo.total = res.data.courseCount;
       });
     },
     //   添加一个学生

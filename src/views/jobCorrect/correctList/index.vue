@@ -24,22 +24,26 @@
           </template>
         </el-table-column>
       </el-table>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
     </div>
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
+
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       job_type: "0",
-      correct_list: [
-        // {
-        //   title: "周三上午第一节课课后作业",
-        //   question_counts: "10题",
-        //   upload_counts: "3份",
-        //   id: 1
-        // }
-      ]
+      layerpageinfo: {
+        pageSize: 6,
+        pageNum: 1,
+        total: 0
+      },
+      correct_list: []
     };
   },
   computed: {
@@ -51,6 +55,10 @@ export default {
     this.getHomeWorkList();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getHomeWorkList();
+    },
     toDetail(id) {
       this.$router.push({ name: "correct_detail", query: { homeworkId: id } });
     },
@@ -60,12 +68,14 @@ export default {
         courseId: this.courseId,
         homeworkType: this.job_type == "0" ? "课后作业" : "课堂测试"
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getHomeWorkList(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
         this.correct_list = list ? list : [];
+        this.layerpageinfo.total = res.totalSize
       });
     }
   }

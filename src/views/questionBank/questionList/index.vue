@@ -3,7 +3,7 @@
     <div class="title">
       <label>
         题型：
-        <el-select v-model="question_type" placeholder="请选择题目类型" @change="getQuestions">
+        <el-select v-model="question_type" placeholder="请选择题目类型" @change="typeChange">
           <el-option label="选择题" value="选择题"></el-option>
           <el-option label="填空题" value="填空题"></el-option>
           <el-option label="判断题" value="判断题"></el-option>
@@ -27,7 +27,7 @@
           </template>
         </el-table-column>
       </el-table>
-
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange" v-show="type"></myPage>
       <el-table border :data="question_list" class="my_table" v-show="!type" style="width: 100%">
         <el-table-column align="center" prop="titleName" label="题目"></el-table-column>
         <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
@@ -38,6 +38,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <myPage :layerpageinfo="layerpageinfo1" @pageChange="pageChange1" v-show="!type"></myPage>
     </div>
     <el-dialog
       title="题目修改"
@@ -78,12 +79,26 @@
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       question_list: [],
       question_type: "选择题",
       dialogVisible: false,
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
+      layerpageinfo1: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
       type: true, //切换是否为选择题类型
       form: {}
     };
@@ -92,6 +107,22 @@ export default {
     this.getQuestions();
   },
   methods: {
+    typeChange() {
+      if (this.question_type == "选择题") this.type = true;
+      else {
+        this.type = false;
+        this.layerpageinfo1.pageNum = 1;
+      }
+      this.getQuestions();
+    },
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getQuestions();
+    },
+    pageChange1(val) {
+      this.layerpageinfo1.pageNum = val;
+      this.getQuestions();
+    },
     // 显示修改题目的弹窗
     showEdit(title) {
       this.form = Object.assign({}, title);
@@ -130,19 +161,20 @@ export default {
     },
     // 按类型获取题目列表
     getQuestions() {
-      let a = {
-        pageSize: 1,
-        pageNum: 2
-      };
-      let obj = { titleType: this.question_type, ...a };
+      let obj = { titleType: this.question_type };
+      if (this.type) {
+        obj = Object.assign({}, obj, this.layerpageinfo);
+      } else {
+        obj = Object.assign({}, obj, this.layerpageinfo1);
+      }
       let str = JSON.stringify(obj);
       this.api.getQuestions(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
-        if (this.question_type == "选择题") this.type = true;
-        else this.type = false;
         let list = res.data;
         this.question_list = list ? list : [];
+        this.layerpageinfo.total = res.totalSize;
+        this.layerpageinfo1.total = res.totalSize;
       });
     },
     //跳转导入题目页面

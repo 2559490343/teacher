@@ -10,7 +10,7 @@
         </p>
         <p>
           <span class="left">题目数量:</span>
-          <span>{{job_info.list?job_info.list.length:0}}</span>
+          <span>{{job_info.homeworkCount}}题</span>
         </p>
         <p>
           <span class="left">添加时间:</span>
@@ -29,16 +29,27 @@
           <el-table-column align="center" prop="titleD" label="选项D"></el-table-column>
           <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         </el-table>
+        <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       </div>
     </div>
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
+
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       job_info: {},
       question_list: [],
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
       homeworkId: ""
     };
   },
@@ -47,16 +58,22 @@ export default {
     this.getHomeWorkDetail();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getHomeWorkDetail();
+    },
     goBack() {
       this.$router.push({ name: "job_list" });
     },
     getHomeWorkDetail() {
       let obj = { homeworkId: this.homeworkId };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getHomeWorkDetail(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         this.job_info = res.data ? res.data : {};
+        this.layerpageinfo.total = res.data.homeworkCount;
         this.question_list = this.job_info.titleList;
       });
     }

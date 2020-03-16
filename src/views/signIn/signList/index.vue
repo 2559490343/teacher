@@ -28,6 +28,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
     </div>
     <!-- 签到发起表单 -->
     <el-dialog
@@ -61,7 +62,11 @@
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
 export default {
+  components: {
+    myPage
+  },
   data() {
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
@@ -75,6 +80,11 @@ export default {
     return {
       sign_list: [],
       dialogVisible: false,
+      layerpageinfo: {
+        pageSize: 6,
+        pageNum: 1,
+        total: 0
+      },
       form: {
         title: "",
         truancyTime: null,
@@ -103,6 +113,10 @@ export default {
     this.getSignList();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getSignList();
+    },
     // 删除签到
     deleteSign(signId) {
       this.$confirm("确定要删除此次签到吗？", "提示", {
@@ -177,6 +191,7 @@ export default {
           courseId: this.courseId
         }
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getSignList(str).then(res => {
         console.log(res);
@@ -186,6 +201,7 @@ export default {
           return item.sign;
         });
         this.sign_list = list ? list : [];
+        this.layerpageinfo.total = res.totalSize;
       });
     }
   }

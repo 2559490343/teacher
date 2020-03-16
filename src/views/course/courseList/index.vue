@@ -50,6 +50,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
     </div>
     <!-- 添加学期 -->
     <el-dialog
@@ -147,7 +148,11 @@ export default {
       termId: "",
       term: "",
       term_list: [],
-
+      layerpageinfo: {
+        pageSize: 6,
+        pageNum: 1,
+        total: 0
+      },
       ruleForm: {
         year1: "",
         year2: "",
@@ -168,8 +173,11 @@ export default {
   created() {
     this.getTerm();
   },
-  mounted() {},
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getCourse();
+    },
     // 删除课程
     deleteCourse(courseId) {
       this.$confirm("确定要删除此课程吗？", "提示", {
@@ -252,10 +260,12 @@ export default {
       let obj = {
         termId: this.termId
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getCourse(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
+        this.layerpageinfo.total = res.totalSize;
         let list = res.data;
         this.courseList = list ? list : [];
       });

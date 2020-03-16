@@ -35,14 +35,25 @@
           </template>
         </el-table-column>
       </el-table>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
     </div>
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
+
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       job_type: "0",
+      layerpageinfo: {
+        pageSize: 6,
+        pageNum: 1,
+        total: 0
+      },
       job_list: []
     };
   },
@@ -55,6 +66,10 @@ export default {
     this.getHomeWorkList();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getHomeWorkList();
+    },
     deleteHomework(homeworkId) {
       this.$confirm("确定要删除此作业吗？", "提示", {
         type: "warning"
@@ -87,12 +102,14 @@ export default {
         courseId: this.courseId,
         homeworkType: this.job_type == "0" ? "课后作业" : "课堂测试"
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getHomeWorkList(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
         this.job_list = list ? list : [];
+        this.layerpageinfo.total = res.totalSize
       });
     },
     // 修改作业发布状态

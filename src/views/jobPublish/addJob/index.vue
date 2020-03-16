@@ -15,7 +15,12 @@
         </el-form-item>
       </el-form>
 
-      <el-table border :data="question_list" class="my_table" style="width: 100%">
+      <el-table
+        border
+        :data="question_list.slice((layerpageinfo.pageNum-1)*layerpageinfo.pageSize,layerpageinfo.pageNum*layerpageinfo.pageSize)"
+        class="my_table"
+        style="width: 100%"
+      >
         <el-table-column align="center" prop="titleName" label="题目"></el-table-column>
         <el-table-column align="center" prop="titleA" label="选项A"></el-table-column>
         <el-table-column align="center" prop="titleB" label="选项B"></el-table-column>
@@ -28,7 +33,7 @@
           </template>
         </el-table-column>
       </el-table>
-
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       <div class="form_btn">
         <el-button type="primary" @click="submitJob('form')">添加作业</el-button>
       </div>
@@ -60,9 +65,10 @@
           v-show="question_type=='0'"
           style="width: 100%"
           @selection-change="handleSelectionChange1"
+          :row-key="getRowKey1"
           ref="multipleTable1"
         >
-          <el-table-column align="center" type="selection" width="55"></el-table-column>
+          <el-table-column align="center" type="selection" :reserve-selection="true" width="55"></el-table-column>
           <el-table-column align="center" prop="titleName" label="题目"></el-table-column>
           <el-table-column align="center" prop="titleA" label="选项A"></el-table-column>
           <el-table-column align="center" prop="titleB" label="选项B"></el-table-column>
@@ -70,7 +76,11 @@
           <el-table-column align="center" prop="titleD" label="选项D"></el-table-column>
           <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         </el-table>
-
+        <myPage
+          :layerpageinfo="layerpageinfo1"
+          @pageChange="pageChange1"
+          v-show="question_type=='0'"
+        ></myPage>
         <el-table
           border
           :data="question_bank[1]"
@@ -78,12 +88,18 @@
           v-show="question_type=='1'"
           style="width: 100%"
           @selection-change="handleSelectionChange2"
+          :row-key="getRowKey2"
           ref="multipleTable2"
         >
-          <el-table-column align="center" type="selection" width="55"></el-table-column>
+          <el-table-column align="center" type="selection" :reserve-selection="true" width="55"></el-table-column>
           <el-table-column align="center" prop="titleName" label="题目"></el-table-column>
           <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         </el-table>
+        <myPage
+          :layerpageinfo="layerpageinfo2"
+          @pageChange="pageChange2"
+          v-show="question_type=='1'"
+        ></myPage>
         <el-table
           border
           :data="question_bank[2]"
@@ -91,14 +107,20 @@
           v-show="question_type=='2'"
           style="width: 100%"
           @selection-change="handleSelectionChange3"
+          :row-key="getRowKey3"
           ref="multipleTable3"
         >
-          <el-table-column align="center" type="selection" width="55"></el-table-column>
+          <el-table-column align="center" type="selection" reserve-selection width="55"></el-table-column>
           <el-table-column align="center" prop="titleName" label="题目"></el-table-column>
           <el-table-column align="center" prop="titleAnswer" label="答案">
             <template slot-scope="scope">{{scope.row.titleAnswer=='1'?'对':'错'}}</template>
           </el-table-column>
         </el-table>
+        <myPage
+          :layerpageinfo="layerpageinfo3"
+          @pageChange="pageChange3"
+          v-show="question_type=='2'"
+        ></myPage>
         <el-table
           border
           :data="question_bank[3]"
@@ -106,12 +128,18 @@
           v-show="question_type=='3'"
           style="width: 100%"
           @selection-change="handleSelectionChange4"
+          :row-key="getRowKey4"
           ref="multipleTable4"
         >
-          <el-table-column align="center" type="selection" width="55"></el-table-column>
+          <el-table-column align="center" type="selection" reserve-selection width="55"></el-table-column>
           <el-table-column align="center" prop="titleName" label="题目"></el-table-column>
           <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         </el-table>
+        <myPage
+          :layerpageinfo="layerpageinfo4"
+          @pageChange="pageChange4"
+          v-show="question_type=='3'"
+        ></myPage>
       </div>
       <span slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -121,7 +149,11 @@
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       form: {
@@ -141,7 +173,32 @@ export default {
       select_list2: [],
       select_list3: [],
       select_list4: [],
-      homeworkType: ""
+      homeworkType: "",
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
+      layerpageinfo1: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
+      layerpageinfo2: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
+      layerpageinfo3: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
+      layerpageinfo4: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      }
     };
   },
   computed: {
@@ -154,15 +211,49 @@ export default {
     this.homeworkType = this.$route.query.type == "0" ? "课后作业" : "课堂测试";
   },
   methods: {
+    getRowKey1(row) {
+      return row.titleId;
+    },
+    getRowKey2(row) {
+      return row.titleId;
+    },
+    getRowKey3(row) {
+      return row.titleId;
+    },
+    getRowKey4(row) {
+      return row.titleId;
+    },
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+    },
+    pageChange1(val) {
+      this.layerpageinfo1.pageNum = val;
+      this.getQuestions("选择题", 0);
+    },
+    pageChange2(val) {
+      this.layerpageinfo2.pageNum = val;
+      this.getQuestions("填空题", 1);
+    },
+    pageChange3(val) {
+      this.layerpageinfo3.pageNum = val;
+      this.getQuestions("判断题", 2);
+    },
+    pageChange4(val) {
+      this.layerpageinfo4.pageNum = val;
+      this.getQuestions("简答题", 3);
+    },
     // 按类型获取题目列表
     getQuestions(titleType, index) {
       let obj = { titleType };
+      obj = Object.assign({}, obj, this[`layerpageinfo${index + 1}`]);
       let str = JSON.stringify(obj);
       this.api.getQuestions(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
         this.question_bank[index] = list ? list : [];
+        this.$forceUpdate();
+        this[`layerpageinfo${index + 1}`].total = res.totalSize || 0;
       });
     },
     async getAllQuestion() {
@@ -247,6 +338,7 @@ export default {
     selectQuestion() {
       this.dialogVisible = false;
       this.question_list = this.select_list.concat([]);
+      this.layerpageinfo.total = this.question_list.length;
       //   this.$refs.multipleTable1.clearSelection();
     }
   }
@@ -257,7 +349,13 @@ export default {
   .content {
     .form_btn {
       text-align: center;
-      padding-top: 30px;
+      padding-top: 20px;
+    }
+    .my_page {
+      //分页
+      .page {
+        text-align: right !important;
+      }
     }
   }
   .el-dialog__wrapper {

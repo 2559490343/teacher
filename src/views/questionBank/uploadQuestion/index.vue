@@ -11,10 +11,11 @@
             <el-option label="判断题" value="2"></el-option>
             <el-option label="简答题" value="3"></el-option>
           </el-select>
-          <el-button type="primary" @click="addQuestion">添加题目</el-button>
-          <el-button type="primary" @click="upLoadXlsx">批量导入</el-button>
+          <el-button type="primary" @click="addQuestion">添加单题</el-button>
+          <!-- <el-button type="primary" @click="upLoadXlsx">批量导入</el-button> -->
         </label>
-        <el-button type="primary" @click="upLoad">上传</el-button>
+        <!-- <el-button type="primary" @click="upLoad">上传</el-button> -->
+        <el-button type="primary" @click="upLoadXlsx">批量导入</el-button>
       </div>
       <el-table
         border
@@ -53,6 +54,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="form_btn">
+        <el-button type="primary" @click="upLoad">上传题库</el-button>
+      </div>
     </div>
     <input
       type="file"
@@ -71,8 +75,8 @@
       :close-on-click-modal="false"
     >
       <div class="inner">
-        <el-form :model="form" ref="form" label-width="80px">
-          <el-form-item label="题目">
+        <el-form :model="form" ref="form" :rules="rules" label-width="80px">
+          <el-form-item label="题目" prop="titleName">
             <el-input v-model="form.titleName" class="input_width"></el-input>
           </el-form-item>
           <el-form-item label="选项A" v-if="question_type == '0'">
@@ -87,17 +91,17 @@
           <el-form-item label="选项D" v-if="question_type == '0'">
             <el-input v-model="form.titleD" class="input_width"></el-input>
           </el-form-item>
-          <el-form-item label="答案" v-if="question_type == '3'">
+          <!-- <el-form-item label="答案" v-if="question_type == '3'">
             <el-input type="textarea" v-model="form.titleAnswer" class="input_width"></el-input>
-          </el-form-item>
-          <el-form-item label="答案" v-else>
+          </el-form-item>-->
+          <el-form-item label="答案" v-if="question_type != '3'" prop="titleAnswer">
             <el-input v-model="form.titleAnswer" class="input_width"></el-input>
           </el-form-item>
         </el-form>
       </div>
       <span slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="optQuestion">确 定</el-button>
+        <el-button type="primary" @click="submitForm('form')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -118,12 +122,27 @@ export default {
         titleD: "",
         titleAnswer: ""
       },
+      rules: {
+        titleName: [{ required: true, message: "请输入题目", trigger: "blur" }],
+        titleAnswer: [
+          { required: true, message: "请输入答案", trigger: "blur" }
+        ]
+      },
       flag: true, //添加题目或者是修改题目的flag
       index: null,
       importList: [] //上传的题目列表参数
     };
   },
   methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.optQuestion()
+        } else {
+          return false;
+        }
+      });
+    },
     //读取xlsx文件
     readXLSX(file) {
       let files = file.target.files[0];
@@ -168,6 +187,10 @@ export default {
     },
     //上传题目
     upLoad() {
+      if (this.importList.length == 0) {
+        this.$message.warning("上传题目列表不能为空");
+        return;
+      }
       let str = JSON.stringify(this.importList);
       this.api.importQuestions(str).then(res => {
         console.log(res);
@@ -181,7 +204,9 @@ export default {
     },
     goBack() {
       this.$router.push({ name: "question_list" });
-      location.reload()
+      setTimeout(() => {
+        location.reload();
+      }, 100);
     },
     // 操作题目
     optQuestion() {
@@ -221,7 +246,7 @@ export default {
           Object.assign({}, this.form)
         );
         this.dialogVisible = false;
-        this.$message("修改题目成功");
+        this.$message.success("修改题目成功");
         this.importList = [];
         this.question_list.forEach(item => {
           this.importList = this.importList.concat(item);
@@ -271,6 +296,10 @@ export default {
     padding-top: 10px;
     .title {
       padding: 0;
+    }
+    .form_btn {
+      text-align: center;
+      padding-top: 30px;
     }
     .my_table {
       border: 1px solid #e5e8ed;

@@ -3,9 +3,10 @@
     <el-page-header @back="goBack" content="导入学生"></el-page-header>
     <div class="content">
       <div class="title">
-        <el-button type="primary" @click="upLoadXlsx">批量导入</el-button>
+        <el-button type="primary" @click="upLoadXlsx">上传文件</el-button>
+        <el-button type="primary" @click="submitUpload" v-show="student_list.length">导入名单</el-button>
       </div>
-      <el-table border :data="student_list" class="my_table" style="width: 100%">
+      <el-table border :data="student_list.slice((layerpageinfo.pageNum-1)*layerpageinfo.pageSize,layerpageinfo.pageNum*layerpageinfo.pageSize)" class="my_table" style="width: 100%">
         <el-table-column align="center" prop="studentName" label="姓名"></el-table-column>
         <el-table-column align="center" prop="studentNum" label="学号"></el-table-column>
         <el-table-column align="center" label="操作">
@@ -15,10 +16,10 @@
           </template>
         </el-table-column>
       </el-table>
-
-      <div class="btns" v-show="student_list.length">
-        <el-button type="primary" @click="submitUpload">导入</el-button>
-      </div>
+      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
+      <!-- <div class="btns" v-show="student_list.length">
+        <el-button type="primary" @click="submitUpload">导入名单</el-button>
+      </div>-->
     </div>
     <el-dialog
       title="修改"
@@ -59,11 +60,21 @@
 </template>
 <script>
 import XLSX from "xlsx";
+import myPage from "@/components/myPage.vue";
+
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       student_list: [],
       dialogVisible: false,
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      },
       form: {
         name: "",
         class: null,
@@ -77,6 +88,9 @@ export default {
     }
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+    },
     //   修改
     changeStudent(index) {
       this.index = index;
@@ -130,6 +144,7 @@ export default {
       let a = XLSX.utils.sheet_to_json(worksheet1);
       //   console.log(j);
       this.student_list = [...a];
+      this.layerpageinfo.total = this.student_list.length || 0;
       // console.log(list);
 
       return false;

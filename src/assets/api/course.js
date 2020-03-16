@@ -26,7 +26,7 @@ const api = {
     },
     // 查询课程详情信息
     getCourseInfo: (params) => {
-        return req.apiAxios("POST", '/api/course/allstudent/', params)
+        return req.apiAxios("POST", '/api/course/allstudent', params)
     },
     // 课程邀请码相关
     getCourseCode: (params) => {

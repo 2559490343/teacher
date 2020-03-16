@@ -34,17 +34,27 @@
           <el-table-column align="center" prop="studentNum" label="学号"></el-table-column>
           <el-table-column align="center" prop="studentName" label="姓名"></el-table-column>
         </el-table>
+        <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       </div>
     </div>
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       courseInfo: {},
       student_list: [], //签到人员列表
-      courseId: ""
+      courseId: "",
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      }
     };
   },
   created() {
@@ -52,14 +62,24 @@ export default {
     this.getCourseInfo();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getCourseInfo();
+    },
     goBack() {
       this.$router.push({ name: "courseList" });
     },
     getCourseInfo() {
-      this.api.getCourseInfo(this.courseId).then(res => {
+      let obj = {
+        courseId: this.courseId
+      };
+      obj = Object.assign({}, this.layerpageinfo, obj);
+      let str = JSON.stringify(obj);
+      this.api.getCourseInfo(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         this.courseInfo = res.data || {};
+        this.layerpageinfo.total = res.data.courseCount;
       });
     }
   }

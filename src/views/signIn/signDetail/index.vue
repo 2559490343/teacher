@@ -38,18 +38,29 @@
           <el-table-column align="center" prop="studentName" label="姓名"></el-table-column>
           <el-table-column align="center" prop="studentStatus" label="签到状态"></el-table-column>
         </el-table>
+        <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       </div>
     </div>
   </div>
 </template>
 <script>
+import myPage from "@/components/myPage.vue";
+
 export default {
+  components: {
+    myPage
+  },
   data() {
     return {
       sign_info: {},
       signin_list: [], //签到人员列表
       signId: "",
-      sign_counts: 0
+      sign_counts: 0,
+      layerpageinfo: {
+        pageSize: 5,
+        pageNum: 1,
+        total: 0
+      }
     };
   },
   computed: {
@@ -62,6 +73,10 @@ export default {
     this.getSignDetail();
   },
   methods: {
+    pageChange(val) {
+      this.layerpageinfo.pageNum = val;
+      this.getSignDetail();
+    },
     goBack() {
       this.$router.push({ name: "signList" });
     },
@@ -71,15 +86,18 @@ export default {
         courseId: this.courseId,
         signId: this.signId
       };
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getSignDetail(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
         this.signin_list = list ? list : [];
+        this.layerpageinfo.total = res.totalSize;
         this.sign_info = list ? list[0].sign : {};
         this.signin_list.forEach(item => {
-          if (item.studentStatus !== "旷课"&&item.studentStatus) this.sign_counts++;
+          if (item.studentStatus !== "旷课" && item.studentStatus)
+            this.sign_counts++;
         });
       });
     }

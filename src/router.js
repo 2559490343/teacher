@@ -230,15 +230,15 @@ let routes = [
                         },
                         component: () => import("@/views/student/studentList/index.vue")
                     },
-                    {
-                        path: 'student_detail',
-                        name: 'student_detail',
-                        meta: {
-                            title: '学生详情',
-                            hidden: false
-                        },
-                        component: () => import("@/views/student/studentDetail/index.vue")
-                    },
+                    // {
+                    //     path: 'student_detail',
+                    //     name: 'student_detail',
+                    //     meta: {
+                    //         title: '学生详情',
+                    //         hidden: false
+                    //     },
+                    //     component: () => import("@/views/student/studentDetail/index.vue")
+                    // },
                     {
                         path: 'upload_student',
                         name: 'upload_student',

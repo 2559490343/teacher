@@ -29,7 +29,7 @@
         <el-table-column align="center" prop="titleAnswer" label="答案"></el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button type="text">删除</el-button>
+            <el-button type="text" @click="deleteTitle(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -211,6 +211,18 @@ export default {
     this.homeworkType = this.$route.query.type == "0" ? "课后作业" : "课堂测试";
   },
   methods: {
+    // 删除已选择的题目
+    deleteTitle(index) {
+      // console.log(index+(this.layerpageinfo.pageNum-1)*this.layerpageinfo.pageSize);
+      let i =
+        index + (this.layerpageinfo.pageNum - 1) * this.layerpageinfo.pageSize;
+      this.question_list.splice(i, 1);
+      this.layerpageinfo.total--;
+      if (this.layerpageinfo.total <= this.layerpageinfo.pageSize) {
+        this.layerpageinfo.pageNum = 1;
+      }
+      // this.$forceUpdate();
+    },
     getRowKey1(row) {
       return row.titleId;
     },

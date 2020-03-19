@@ -14,7 +14,7 @@
         </p>
         <p>
           <span class="left">提交数量:</span>
-          <span>{{commits.length||0}}份</span>
+          <span>{{commitCount||0}}份</span>
         </p>
         <p>
           <span class="left">题目正确率:</span>
@@ -51,8 +51,7 @@
             </template>
           </el-table-column>
         </el-table>
-      <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
-
+        <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       </div>
     </div>
 
@@ -92,7 +91,8 @@ export default {
         pageNum: 1,
         total: 0
       },
-      commits: [] //提交作业列表
+      commits: [], //提交作业列表
+      commitCount: 0
     };
   },
   created() {
@@ -122,13 +122,14 @@ export default {
       let obj = {
         homeworkId: this.$route.query.homeworkId
       };
-       obj = Object.assign({}, obj, this.layerpageinfo);
+      obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getHomeWorkSubmitDetail(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
         this.commits = res.data ? res.data.commits : [];
-        this.layerpageinfo.total = res.data.commitCount
+        this.layerpageinfo.total = res.data.commitCount;
+        this.commitCount = res.data.commitCount;
       });
     },
     // 获取作业信息

@@ -118,6 +118,7 @@ export default {
     myPage
   },
   data() {
+    
     return {
       dialogVisible: false,
       dialogVisible2: false,

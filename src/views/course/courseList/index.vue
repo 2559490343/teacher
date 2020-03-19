@@ -236,6 +236,9 @@ export default {
     closePublishDetail() {
       this.dialogVisible2 = false;
       clearInterval(this.timer);
+      console.log(this.countTime);
+      
+      if (this.countTime <= 0) this.getCourse();
     },
     // 修改当前学期
     changeTerm(termId) {
@@ -296,6 +299,7 @@ export default {
         if (res.code !== 0) return;
         this.$message.success("发布课程成功!");
         this.dialogVisible3 = false;
+        this.ruleForm1.end = undefined;
         this.getCourse();
       });
     },

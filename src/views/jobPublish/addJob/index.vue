@@ -1,7 +1,7 @@
 <template>
   <div class="addJob">
     <!-- <div class="title"></div> -->
-    <el-page-header @back="goBack" content="添加作业"></el-page-header>
+    <el-page-header @back="goBack" :content="content"></el-page-header>
     <div class="content">
       <el-form :model="form" ref="form" :rules="rules" label-width="100px">
         <el-form-item label="标题:" prop="homeworkTitle">
@@ -198,7 +198,8 @@ export default {
         pageSize: 5,
         pageNum: 1,
         total: 0
-      }
+      },
+      content:''
     };
   },
   computed: {
@@ -209,20 +210,27 @@ export default {
   created() {
     this.getAllQuestion();
     this.homeworkType = this.$route.query.type == "0" ? "课后作业" : "课堂测试";
+    this.content = this.$route.query.type == "0" ? "添加作业" : "添加测试";
   },
   methods: {
     // 删除已选择的题目
     deleteTitle(index) {
-      // console.log(index+(this.layerpageinfo.pageNum-1)*this.layerpageinfo.pageSize);
-      let i =
-        index + (this.layerpageinfo.pageNum - 1) * this.layerpageinfo.pageSize;
-      this.question_list.splice(i, 1);
-      this.layerpageinfo.total--;
-      if (this.layerpageinfo.total <= this.layerpageinfo.pageSize) {
-        this.layerpageinfo.pageNum = 1;
-      }
-      // this.$forceUpdate();
+      this.$confirm("要移除这道题吗？", "提示", { type: "warning" })
+        .then(() => {
+          let i =
+            index +
+            (this.layerpageinfo.pageNum - 1) * this.layerpageinfo.pageSize;
+          this.question_list.splice(i, 1);
+          this.layerpageinfo.total--;
+          if (this.layerpageinfo.total <= this.layerpageinfo.pageSize) {
+            this.layerpageinfo.pageNum = 1;
+          }
+        })
+        .catch(() => {
+          return;
+        });
     },
+
     getRowKey1(row) {
       return row.titleId;
     },
@@ -287,6 +295,7 @@ export default {
         }
       });
     },
+    // 提交发布作业
     addHomeWork() {
       let homeworkTime = this.common.formatDateTime(new Date());
       let list = [...this.question_list];

@@ -35,6 +35,7 @@
       title="发起签到"
       :visible.sync="dialogVisible"
       width="430px"
+      :close-on-click-modal="false"
       @close="dialogVisible = false"
     >
       <div class="form">
@@ -68,11 +69,22 @@ export default {
     myPage
   },
   data() {
+    var validatePass1 = (rule, value, callback) => {
+      if (value <= 0) {
+        callback(new Error("请输入大于0的时长!"));
+      } else if (value < this.form.lateTime) {
+        callback(new Error("签到持续时长不能小于迟到时间!"));
+      } else {
+        callback();
+      }
+    };
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入迟到时间"));
       } else if (value > this.form.truancyTime) {
         callback(new Error("迟到时间不能大于签到持续时长!"));
+      } else if (value <= 0) {
+        callback(new Error("请输入大于0的时长!"));
       } else {
         callback();
       }
@@ -99,7 +111,8 @@ export default {
         ],
         truancyTime: [
           { required: true, message: "请输入签到持续时长", trigger: "blur" },
-          { type: "number", message: "时长为数字值" }
+          { type: "number", message: "时长为数字值" },
+          { validator: validatePass1, trigger: "blur" }
         ]
       }
     };
@@ -123,7 +136,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          let obj = { signId };
+          let obj = { signId, courseId: this.courseId };
           let str = JSON.stringify(obj);
           this.api.delSign(str).then(res => {
             if (res.code !== 0) return;
@@ -171,7 +184,7 @@ export default {
           this.api.addSign(str).then(res => {
             console.log(res);
             if (res.code !== 0) return;
-            this.$message("发起签到成功");
+            this.$message.success("发起签到成功");
             this.getSignList();
             this.dialogVisible = false;
             this.form.title = "";
@@ -196,9 +209,9 @@ export default {
       this.api.getSignList(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
-        let list = res.data;
+        let list = res.data || [];
         list = list.map(item => {
-          return item.sign;
+          return item.sign || {};
         });
         this.sign_list = list ? list : [];
         this.layerpageinfo.total = res.totalSize;
@@ -208,11 +221,4 @@ export default {
 };
 </script>
 <style lang="scss">
-// .signList {
-//   // .el-dialog__wrapper {
-//   //   // input {
-//   //   //   // width: 250px;
-//   //   // }
-//   // }
-// }
 </style>

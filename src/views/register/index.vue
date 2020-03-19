@@ -117,8 +117,8 @@ export default {
     },
     handleRegister() {
       let password = md5(this.params.teacherPassword);
-      this.params.teacherPassword = password;
-      let str = JSON.stringify(this.params);
+      let obj = Object.assign({}, this.params, { teacherPassword: password });
+      let str = JSON.stringify(obj);
       this.api.register(str).then(res => {
         // console.log(res);
         if (res.code !== 0) return;

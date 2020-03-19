@@ -70,18 +70,18 @@ export default {
   },
   created() {
     this.signId = this.$route.query.signId;
-    this.getSignDetail();
+    this.getSignDetail(true);
   },
   methods: {
     pageChange(val) {
       this.layerpageinfo.pageNum = val;
-      this.getSignDetail();
+      this.getSignDetail(false);
     },
     goBack() {
       this.$router.push({ name: "signList" });
     },
     // 查看签到详情
-    getSignDetail() {
+    getSignDetail(flag) {
       let obj = {
         courseId: this.courseId,
         signId: this.signId
@@ -95,10 +95,7 @@ export default {
         this.signin_list = list ? list : [];
         this.layerpageinfo.total = res.totalSize;
         this.sign_info = list ? list[0].sign : {};
-        this.signin_list.forEach(item => {
-          if (item.studentStatus !== "旷课" && item.studentStatus)
-            this.sign_counts++;
-        });
+        this.sign_counts = list ? list[0].cid : 0;
       });
     }
   }

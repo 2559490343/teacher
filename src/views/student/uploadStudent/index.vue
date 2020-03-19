@@ -140,13 +140,10 @@ export default {
     //把xlsx文件内容转成json格式
     async beforeUpload(file) {
       const workbook = await this.readXLSX(file);
-      let worksheet1 = workbook.Sheets["Sheet5"];
+      let worksheet1 = workbook.Sheets["Sheet1"];
       let a = XLSX.utils.sheet_to_json(worksheet1);
-      //   console.log(j);
       this.student_list = [...a];
       this.layerpageinfo.total = this.student_list.length || 0;
-      // console.log(list);
-
       return false;
     },
     //触发文件读取

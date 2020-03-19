@@ -9,15 +9,19 @@
       @close="hideEditInfo"
     >
       <div class="change">
-        <el-form ref="form" label-width="80px">
-          <el-form-item label="姓名:">
-            <el-input v-model="teacherName" class="input_width"></el-input>
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-form-item
+            label="姓名:"
+            prop="teacherName"
+            :rules="{ required: true, message: '请输入姓名', trigger: 'blur' }"
+          >
+            <el-input v-model="form.teacherName" class="input_width"></el-input>
           </el-form-item>
         </el-form>
       </div>
       <span slot="footer">
         <el-button @click="hideEditInfo">取 消</el-button>
-        <el-button type="primary" @click="editInfo">确 定</el-button>
+        <el-button type="primary" @click="submitForm('form')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -26,7 +30,9 @@
 export default {
   data() {
     return {
-      teacherName: ""
+      form: {
+        teacherName: ""
+      }
     };
   },
   props: {
@@ -34,21 +40,30 @@ export default {
   },
   created() {},
   methods: {
-    //   隐藏切换课程
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.editInfo();
+        } else {
+          return false;
+        }
+      });
+    },
+    //   隐藏修改信息
     hideEditInfo() {
       this.$store.dispatch("setEditInfo", false);
     },
     // 提交修改个人信息
     editInfo() {
       let obj = {
-        teacherName: this.teacherName
+        teacherName: this.form.teacherName
       };
       let str = JSON.stringify(obj);
       this.api.editName(str).then(res => {
         if (res.code !== 0) return;
         this.$message.success("修改成功！");
-        sessionStorage.setItem("teacherName", this.teacherName);
-        this.$store.dispatch("setTeacherName", this.teacherName);
+        sessionStorage.setItem("teacherName", this.form.teacherName);
+        this.$store.dispatch("setTeacherName", this.form.teacherName);
         this.hideEditInfo();
       });
     },
@@ -57,7 +72,7 @@ export default {
       this.api.getTeacherInfo().then(res => {
         console.log(res);
         if (res.code !== 0) return;
-        this.teacherName = res.data.teacherName;
+        this.form.teacherName = res.data.teacherName;
       });
     }
   }

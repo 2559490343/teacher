@@ -71,7 +71,7 @@ export default {
         // console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
-        this.termList = list.length ? list : [];
+        this.termList = list.length ? list.reverse() : [];
         this.termId = list[0].termId;
         // this.termId = list[0].termId;
         this.getCourse();
@@ -87,7 +87,7 @@ export default {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
-        this.courseList = list ? list : [];
+        this.courseList = list ? list.reverse() : [];
       });
     },
     // 切换课程
@@ -101,9 +101,12 @@ export default {
           this.$message.success("已切换当前课程");
           this.$store.dispatch("setCourseId", this.courseId);
           this.$store.dispatch("setChangeCourse", false);
-          setTimeout(() => {
-            location.reload();
-          }, 200);
+          console.log();
+          if (this.$route.name !== "courseList") {
+            setTimeout(() => {
+              location.reload();
+            }, 200);
+          }
           return;
         } else {
           this.$store.dispatch("setChangeCourse", false);

@@ -1,8 +1,11 @@
 <template>
   <div class="studentList">
     <div class="title">
-      <el-button type="primary" @click="uploadStudent">批量导入</el-button>
-      <el-button type="primary" @click="addStudent">添加单个学生</el-button>
+      <div>
+        <el-button type="primary" @click="uploadStudent">批量导入</el-button>
+        <el-button type="primary" @click="addStudent">添加单个学生</el-button>
+      </div>
+      <el-button type="primary" @click="exportList">导出学生信息表</el-button>
     </div>
     <div class="content">
       <el-table :data="student_list" border stripe>
@@ -113,12 +116,12 @@
 </template>
 <script>
 import myPage from "@/components/myPage.vue";
+import XLSX from "xlsx";
 export default {
   components: {
     myPage
   },
   data() {
-    
     return {
       dialogVisible: false,
       dialogVisible2: false,
@@ -321,6 +324,24 @@ export default {
           resolve(res);
         });
       });
+    },
+    // 导出学生信息表xlsx
+    exportList() {
+      let json = [
+        {
+          studentName: "张三",
+          studentNum: "3116004001"
+        },
+        {
+          studentName: "李四",
+          studentNum: "3116004005"
+        },
+        {
+          studentName: "王五",
+          studentNum: "3116004002"
+        }
+      ];
+      this.common.jsonToXlsx(json, "学生信息表.xlsx");
     }
   }
 };

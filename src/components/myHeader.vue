@@ -69,13 +69,13 @@ export default {
     handleCommand(command) {
       if (command === "exit") {
         sessionStorage.clear();
-        this.$router.push({ name: "login" });
+        this.$router.replace({ name: "login" });
         // sessionStorage.removeItem('token')
         // this.$store.dispatch("setLoginStatus", false); // 设置isRouterAlive为false
-        // location.reload(); // 为了重新实例化vue-router对象 避免bug
         this.$store.dispatch("setCourseName", "");
         this.$store.dispatch("setCourseId", "");
         this.$store.dispatch("setTeacherName", "");
+        location.reload(); // 为了重新实例化vue-router对象 避免bug
       } else if (command === "edit") {
         this.$store.dispatch("setEditInfo", true);
       } else if (command === "pwd") {

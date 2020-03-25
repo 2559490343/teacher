@@ -63,7 +63,13 @@
       <div>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="term">
           <el-form-item prop="year1">
-            <el-date-picker v-model="ruleForm.year1" type="year" placeholder="选择学年"></el-date-picker>
+            <el-date-picker
+              v-model="ruleForm.year1"
+              type="year"
+              value-format="yyyy"
+              @change="autoTerm"
+              placeholder="选择学年"
+            ></el-date-picker>
           </el-form-item>
           <em>-</em>
           <el-form-item prop="year2">
@@ -72,6 +78,7 @@
               :disabled="!ruleForm.year1"
               v-model="ruleForm.year2"
               type="year"
+              value-format="yyyy"
               placeholder="选择学年"
             ></el-date-picker>
           </el-form-item>
@@ -237,7 +244,7 @@ export default {
       this.dialogVisible2 = false;
       clearInterval(this.timer);
       console.log(this.countTime);
-      
+
       if (this.countTime <= 0) this.getCourse();
     },
     // 修改当前学期
@@ -251,7 +258,7 @@ export default {
         // console.log(res);
         if (res.code !== 0) return;
         let list = res.data || [];
-        this.term_list = list;
+        this.term_list = list.reverse();
         this.term = list.length ? list[0].termId : "";
         this.termId = list.length ? list[0].termId : "";
         this.getCourse();
@@ -270,7 +277,7 @@ export default {
         if (res.code !== 0) return;
         this.layerpageinfo.total = res.totalSize;
         let list = res.data;
-        this.courseList = list ? list : [];
+        this.courseList = list ? list.reverse() : [];
       });
     },
     // 去添加课程
@@ -308,8 +315,8 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.dialogVisible = false;
-          let year1 = this.ruleForm.year1.getFullYear();
-          let year2 = this.ruleForm.year2.getFullYear();
+          let year1 = this.ruleForm.year1;
+          let year2 = this.ruleForm.year2;
           let termYear = `${year1}-${year2}`;
           let termNo = this.ruleForm.termNo;
           let obj = {
@@ -331,12 +338,9 @@ export default {
     handleClose() {
       this.dialogVisible = false;
     },
+    // 校验学年是否合法
     computeTime() {
-      if (
-        this.ruleForm.year2.getFullYear() -
-          this.ruleForm.year1.getFullYear() !==
-        1
-      ) {
+      if (this.ruleForm.year2 - this.ruleForm.year1 !== 1) {
         this.$message({
           message: "学年必须为一年！",
           duration: 1500,
@@ -344,6 +348,10 @@ export default {
         });
         this.ruleForm.year2 = "";
       }
+    },
+    // 自动填写学年
+    autoTerm(value) {
+      this.ruleForm.year2 = (parseInt(value) + 1).toString();
     },
     // 跳转课程详情
     toCourseDetail(courseId) {

@@ -50,6 +50,18 @@ import md5 from "js-md5";
 export default {
   name: "login",
   data() {
+    var validatePass1 = (rule, value, callback) => {
+      let reg = /^[a-zA-Z0-9_]+$/;
+      if (value === "") {
+        callback(new Error("请输入密码!"));
+      } else if (!reg.test(value)) {
+        callback(new Error("密码必须是英文、数字或下划线组成!"));
+      } else if (/^[0-9]{1,20}$/.test(value)) {
+        callback(new Error("密码不能为纯数字!"));
+      } else {
+        callback();
+      }
+    };
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
@@ -79,7 +91,14 @@ export default {
           }
         ],
         teacherPassword: [
-          { required: true, message: "请输入密码", trigger: "blur" }
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 8,
+            max: 16,
+            message: "密码长度在8到16个字符！",
+            trigger: "blur"
+          },
+          { validator: validatePass1, tigger: "blur" }
         ],
         passwordConfirm: [
           {
@@ -117,7 +136,11 @@ export default {
     },
     handleRegister() {
       let password = md5(this.params.teacherPassword);
-      let obj = Object.assign({}, this.params, { teacherPassword: password });
+      let createTime = this.common.formatDateTime(new Date());
+      let obj = Object.assign({}, this.params, {
+        teacherPassword: password,
+        createTime
+      });
       let str = JSON.stringify(obj);
       this.api.register(str).then(res => {
         // console.log(res);
@@ -131,6 +154,10 @@ export default {
     },
     // 发送验证码
     sendCode() {
+      if (!this.params.teacherEmail) {
+        this.$message.warning("请输入邮箱！");
+        return;
+      }
       let obj = {
         teacherEmail: this.params.teacherEmail
       };

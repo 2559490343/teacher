@@ -26,12 +26,15 @@
         </p>
         <p>
           <span class="left">签到人数:</span>
-          <span>{{sign_counts}}人</span>
+          <span>{{sign_counts||0}}人</span>
         </p>
       </div>
 
       <div class="signin_list_info">
-        <h1>签到人员列表</h1>
+        <div class="table_header">
+          <h1>签到人员列表</h1>
+          <el-button type="primary" @click="exportList">导出签到表</el-button>
+        </div>
 
         <el-table border :data="signin_list" class="my_table" style="width: 100%">
           <el-table-column align="center" prop="studentNum" label="学号"></el-table-column>
@@ -97,6 +100,27 @@ export default {
         this.sign_info = list ? list[0].sign : {};
         this.sign_counts = list ? list[0].cid : 0;
       });
+    },
+    // 导出签到表
+    exportList() {
+      let obj = {
+        courseId: this.courseId,
+        signId: this.signId
+      };
+      let str = JSON.stringify(obj);
+      this.api.getSignDetail(str).then(res => {
+        if (res.code !== 0) return;
+        let list = res.data || [];
+        let json = list.map(item => {
+          let obj = {
+            学号: item.studentNum,
+            姓名: item.studentName,
+            签到状态: item.studentStatus
+          };
+          return obj;
+        });
+        this.common.jsonToXlsx(json, "学生签到表.xlsx");
+      });
     }
   }
 };
@@ -110,7 +134,14 @@ export default {
       font-weight: 600;
       line-height: 60px;
     }
-
+    .table_header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      button {
+        height: 32px;
+      }
+    }
     .base_info {
       border-bottom: 1px solid rgba(236, 240, 245, 1);
       padding-bottom: 20px;

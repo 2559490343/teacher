@@ -230,15 +230,6 @@ let routes = [
                         },
                         component: () => import("@/views/student/studentList/index.vue")
                     },
-                    // {
-                    //     path: 'student_detail',
-                    //     name: 'student_detail',
-                    //     meta: {
-                    //         title: '学生详情',
-                    //         hidden: false
-                    //     },
-                    //     component: () => import("@/views/student/studentDetail/index.vue")
-                    // },
                     {
                         path: 'upload_student',
                         name: 'upload_student',
@@ -250,6 +241,37 @@ let routes = [
                     },
                 ]
             },
+            {
+                path: '/teacher',
+                name: 'teacher',
+                meta: {
+                    title: '教师管理',
+                    hidden: false,
+                    icon: 'el-icon-user-solid'
+                },
+                component: () => import('@/views/teacher/index.vue'),
+                redirect: '/teacher/teacher_list',
+                children: [
+                    {
+                        path: 'teacher_list',
+                        name: 'teacher_list',
+                        meta: {
+                            title: '教师列表',
+                            hidden: false
+                        },
+                        component: () => import("@/views/teacher/teacherList/index.vue")
+                    },
+                    {
+                        path: 'teacher_detail',
+                        name: 'teacher_detail',
+                        meta: {
+                            title: '教师详情',
+                            hidden: false
+                        },
+                        component: () => import("@/views/teacher/teacherDetail/index.vue")
+                    },
+                ]
+            }
 
         ]
     },
@@ -262,6 +284,10 @@ let routes = [
         path: '/register',
         name: "register",
         component: () => import("@/views/register/index.vue")
+    },
+    {
+        path: '*',
+        component: () => import('@/views/p404/p404.vue')
     },
 
 ]

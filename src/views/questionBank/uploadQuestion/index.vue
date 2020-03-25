@@ -14,8 +14,10 @@
           <el-button type="primary" @click="addQuestion">添加单题</el-button>
           <!-- <el-button type="primary" @click="upLoadXlsx">批量导入</el-button> -->
         </label>
-        <!-- <el-button type="primary" @click="upLoad">上传</el-button> -->
-        <el-button type="primary" @click="upLoadXlsx">批量导入</el-button>
+        <div>
+          <el-button type="primary" @click="download">下载文件模板</el-button>
+          <el-button type="primary" @click="upLoadXlsx">批量导入</el-button>
+        </div>
       </div>
       <el-table
         border
@@ -134,10 +136,16 @@ export default {
     };
   },
   methods: {
+    // 下载模板文件
+    download() {
+      let a = document.createElement("a");
+      a.href = "http://39.108.209.99:8081/upload/title.xlsx";
+      a.click();
+    },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.optQuestion()
+          this.optQuestion();
         } else {
           return false;
         }

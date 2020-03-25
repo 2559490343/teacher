@@ -19,7 +19,7 @@ axios.interceptors.request.use(function (config) {
     if (token && typeof token !== 'undefined') {
         config.headers.token = token;
     }
-
+    config.headers.timeStamp = new Date().getTime()
     return config;
 }, function (err) {
     return Promise.reject(err);

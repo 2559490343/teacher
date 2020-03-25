@@ -59,12 +59,12 @@ export default {
       }
     };
   },
-  beforeRouteEnter (to, from, next) {
+  beforeRouteEnter(to, from, next) {
     // ...
-    if(sessionStorage.getItem('token')){
-      next('/course')
-    }else{
-      next()
+    if (sessionStorage.getItem("token")) {
+      next("/course");
+    } else {
+      next();
     }
   },
   created() {
@@ -93,7 +93,12 @@ export default {
         sessionStorage.setItem("teacherEmail", this.params.teacherEmail);
         this.$store.dispatch("setTeacherName", res.data.teacherName);
         this.$message.success("登录成功！");
-        this.$router.push("/course");
+        // 判断用户权限
+        if (res.data.role!='admin') {
+          let len = this.$router.options.routes[0].children.length;
+          this.$router.options.routes[0].children[len - 1].meta.hidden = true;
+        }
+        this.$router.replace("/course");
       });
     }
   }

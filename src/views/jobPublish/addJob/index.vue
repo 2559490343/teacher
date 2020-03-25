@@ -199,7 +199,7 @@ export default {
         pageNum: 1,
         total: 0
       },
-      content:''
+      content: ""
     };
   },
   computed: {
@@ -283,7 +283,12 @@ export default {
       await this.getQuestions("简答题", 3);
     },
     goBack() {
-      this.$router.push({ name: "job_list" });
+      this.$router.push({
+        name: "job_list",
+        query: {
+          type: this.$route.query.type
+        }
+      });
     },
     // 提交作业添加
     submitJob(formName) {

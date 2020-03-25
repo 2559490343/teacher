@@ -3,10 +3,18 @@
     <el-page-header @back="goBack" content="导入学生"></el-page-header>
     <div class="content">
       <div class="title">
-        <el-button type="primary" @click="upLoadXlsx">上传文件</el-button>
+        <div>
+          <el-button type="primary" @click="upLoadXlsx">上传文件</el-button>
+          <el-button type="primary" @click="download">下载模板文件</el-button>
+        </div>
         <el-button type="primary" @click="submitUpload" v-show="student_list.length">导入名单</el-button>
       </div>
-      <el-table border :data="student_list.slice((layerpageinfo.pageNum-1)*layerpageinfo.pageSize,layerpageinfo.pageNum*layerpageinfo.pageSize)" class="my_table" style="width: 100%">
+      <el-table
+        border
+        :data="student_list.slice((layerpageinfo.pageNum-1)*layerpageinfo.pageSize,layerpageinfo.pageNum*layerpageinfo.pageSize)"
+        class="my_table"
+        style="width: 100%"
+      >
         <el-table-column align="center" prop="studentName" label="姓名"></el-table-column>
         <el-table-column align="center" prop="studentNum" label="学号"></el-table-column>
         <el-table-column align="center" label="操作">
@@ -88,6 +96,12 @@ export default {
     }
   },
   methods: {
+    // 下载模板文件
+    download() {
+      let a = document.createElement("a");
+      a.href = "http://39.108.209.99:8081/upload/student.xlsx";
+      a.click();
+    },
     pageChange(val) {
       this.layerpageinfo.pageNum = val;
     },

@@ -43,7 +43,9 @@ export default {
   },
   data() {
     return {
-      menuList: this.$router.options.routes[0].children
+      menuList: this.$router.options.routes[0].children.filter(item=>{
+        return !item.meta.hidden
+      })
     };
   },
   computed: {
@@ -58,7 +60,7 @@ export default {
     }
   },
   created() {
-    // console.log(this.menuList);
+    console.log(this.$router.options);
   }
 };
 </script>

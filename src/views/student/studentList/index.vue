@@ -239,9 +239,9 @@ export default {
       this.index = index;
       this.form = Object.assign({}, this.student_list[index]);
       let grade = Object.assign({}, this.form.grade || {});
-      this.form.regularGrade = grade.regularGrade || null;
-      this.form.examGrade = grade.examGrade || null;
-      this.form.finalGrade = grade.finalGrade || null;
+      this.form.regularGrade = grade.regularGrade || 0;
+      this.form.examGrade = grade.examGrade || 0;
+      this.form.finalGrade = grade.finalGrade || 0;
       console.log(this.form);
       await this.getSignInfo();
       await this.getHomeWorkInfo("课后作业");
@@ -327,21 +327,36 @@ export default {
     },
     // 导出学生信息表xlsx
     exportList() {
-      let json = [
-        {
-          studentName: "张三",
-          studentNum: "3116004001"
-        },
-        {
-          studentName: "李四",
-          studentNum: "3116004005"
-        },
-        {
-          studentName: "王五",
-          studentNum: "3116004002"
-        }
-      ];
-      this.common.jsonToXlsx(json, "学生信息表.xlsx");
+      let obj = {
+        courseId: this.courseId
+      };
+      let str = JSON.stringify(obj);
+      this.api.getAllStudentInfo(str).then(res => {
+        console.log(res);
+        if (res.code !== 0) return;
+        let list = res.data || [];
+        let json = list.map(item => {
+          let obj = {};
+          obj["姓名"] = item.studentName;
+          obj["学号"] = item.studentNum;
+          obj["未签到次数"] = item.cid || 0;
+          obj["作业未提交次数"] = item.pageNum || 0;
+          obj["测试未提交次数"] = item.pageSize || 0;
+          let grade = item.grade || {};
+          if (!item.grade) {
+            obj["平时成绩"] = "未打分";
+            obj["考试成绩"] = "未打分";
+            obj["最终成绩"] = "未打分";
+          } else {
+            let grade = item.grade;
+            obj["平时成绩"] = grade.regularGrade;
+            obj["考试成绩"] = grade.examGrade;
+            obj["最终成绩"] = grade.finalGrade;
+          }
+          return obj;
+        });
+         this.common.jsonToXlsx(json, "学生信息表.xlsx");
+      });
     }
   }
 };

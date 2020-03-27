@@ -3,7 +3,7 @@
     <div class="title">教师列表</div>
     <div class="content">
       <el-table :data="teacher_list" border stripe>
-        <el-table-column align="center" prop="teacherName" label="姓名"></el-table-column>
+        <el-table-column align="center" prop="teacherName" label="教师姓名"></el-table-column>
         <el-table-column align="center" prop="createTime" label="注册时间"></el-table-column>
         <el-table-column align="center" label="拥有课程数量">
           <template slot-scope="scope">{{scope.row.list?scope.row.list.length:0}}</template>

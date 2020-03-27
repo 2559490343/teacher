@@ -61,7 +61,7 @@ function goLogin() {
     router.currentRoute.path !== 'login' &&
         router.push({
             name: 'login',
-            // query: { redirect: router.currentRoute.fullPath }
+            query: { redirect: router.currentRoute.fullPath }
         })
 }
 // 封装axios--------------------------------------------------------------------------------------

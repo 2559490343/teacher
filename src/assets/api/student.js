@@ -20,6 +20,10 @@ const api = {
   editGrade: (params) => {
     return req.apiAxios("POST", "/api/student/updategrade", params)
   },
+  // 获取某门课所有学生的信息
+  getAllStudentInfo:(params)=>{
+    return req.apiAxios("POST", "/api/student/allmessage", params)
+  },
   // 获取所有老师列表
   getAllTeacher: (params) => {
     return req.apiAxios('POST', "/api/teacher/allteacher", params)

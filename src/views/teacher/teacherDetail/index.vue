@@ -26,7 +26,7 @@
         <el-table border :data="teacher_info.list" class="my_table" style="width: 100%">
           <el-table-column align="center" prop="courseName" label="课程名"></el-table-column>
           <el-table-column align="center" prop="courseIntro" label="课程简介"></el-table-column>
-          <el-table-column align="center" prop="courseDetail" label="选课人数"></el-table-column>
+          <el-table-column align="center" prop="courseDetail" label="课程详情"></el-table-column>
         </el-table>
         <myPage :layerpageinfo="layerpageinfo" @pageChange="pageChange"></myPage>
       </div>

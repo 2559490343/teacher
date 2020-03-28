@@ -11,6 +11,10 @@ const api = {
   // 批改某题作业正确还是错误
   correctHomeWork:(params)=>{
     return req.apiAxios("POST",'/api/homework/updategrade',params)
+  },
+  // 分析单题
+  analysisTitle:(params)=>{
+    return req.apiAxios("POST",'/api/student/correctdetail',params)
   }
 }
 export default api;

@@ -139,7 +139,7 @@ export default {
     // 下载模板文件
     download() {
       let a = document.createElement("a");
-      a.href = "http://39.108.209.99:8081/upload/title.xlsx";
+      a.href = "https://8.129.53.167/upload/title.xlsx";
       a.click();
     },
     submitForm(formName) {

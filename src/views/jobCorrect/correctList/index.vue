@@ -74,7 +74,7 @@ export default {
         console.log(res);
         if (res.code !== 0) return;
         let list = res.data;
-        this.correct_list = list ? list.reverse() : [];
+        this.correct_list = list ? list : [];
         this.layerpageinfo.total = res.totalSize;
       });
     }

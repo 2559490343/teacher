@@ -73,7 +73,7 @@
         </el-table>
       </div>
       <el-dialog width="40%" title="单题分析" :visible.sync="innerVisible" append-to-body>
-        <analysisTitle :titleInfo="titleInfo"></analysisTitle>
+        <analysisTitle :titleInfo="titleInfo" v-if="innerVisible"></analysisTitle>
       </el-dialog>
       <span slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -192,11 +192,11 @@ export default {
             switch (item.titleAnswer) {
               case "1":
                 right.count++;
-                right.rate = ((right.count / len).toFixed(3) * 100) + "%";
+                right.rate = (right.count / len).toFixed(3) * 100 + "%";
                 break;
               case "0":
                 error.count++;
-                error.rate = ((error.count / len).toFixed(3) * 100) + "%";
+                error.rate = (error.count / len).toFixed(3) * 100 + "%";
                 break;
               default:
                 break;

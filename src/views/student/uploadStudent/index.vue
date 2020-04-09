@@ -139,7 +139,7 @@ export default {
       let nameSplit = files.name.split(".");
       let format = nameSplit[nameSplit.length - 1];
       if (!["xlsx", "csv"].includes(format)) {
-        alert("请上传后缀为xlsx的文件！");
+        this.$message.warning("请上传后缀为xlsx的文件！");
         return false;
       }
       return new Promise((resolve, reject) => {

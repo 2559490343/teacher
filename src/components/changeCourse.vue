@@ -63,6 +63,7 @@ export default {
     // 切换学期
     changeTerm(termId) {
       this.termId = termId;
+      this.courseId = ''
       this.getCourse();
     },
     // 获取所有学期
@@ -73,7 +74,6 @@ export default {
         let list = res.data;
         this.termList = list.length ? list.reverse() : [];
         this.termId = list[0].termId;
-        // this.termId = list[0].termId;
         this.getCourse();
       });
     },

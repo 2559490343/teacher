@@ -91,12 +91,15 @@ export default {
         if (res.code !== 0) return;
         sessionStorage.setItem("teacherName", res.data.teacherName);
         sessionStorage.setItem("teacherEmail", this.params.teacherEmail);
+        sessionStorage.setItem("role", res.data.role);
         this.$store.dispatch("setTeacherName", res.data.teacherName);
         this.$message.success("登录成功！");
         // 判断用户权限
-        if (res.data.role!='admin') {
-          let len = this.$router.options.routes[0].children.length;
+        let len = this.$router.options.routes[0].children.length;
+        if (res.data.role != "admin") {
           this.$router.options.routes[0].children[len - 1].meta.hidden = true;
+        } else {
+          this.$router.options.routes[0].children[len - 1].meta.hidden = false;
         }
         this.$router.replace("/course");
       });
@@ -111,8 +114,7 @@ a {
 }
 .login {
   position: absolute;
-  background: url("../../assets/img/login/login_bg.jpg") no-repeat;
-  /*background-size: 100%;*/
+  background: url("../../assets/img/login_bg.jpg") no-repeat;
   width: 100%;
   min-height: 100vh;
   background-size: cover;

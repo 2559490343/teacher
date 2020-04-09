@@ -187,8 +187,7 @@ a {
 }
 .login {
   position: absolute;
-  background: url("../../assets/img/login/login_bg.jpg") no-repeat;
-  /*background-size: 100%;*/
+  background: url("../../assets/img/login_bg.jpg") no-repeat;
   width: 100%;
   min-height: 100vh;
   background-size: cover;

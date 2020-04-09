@@ -46,7 +46,6 @@ export default {
   watch: {
     $route(to, from) {
       this.title = to.meta.title ? to.meta.title : "课堂辅助系统";
-      // console.log(to.meta.title);
     }
   },
   computed: {
@@ -68,15 +67,22 @@ export default {
     },
     handleCommand(command) {
       if (command === "exit") {
-        sessionStorage.clear();
-        this.$router.replace({ name: "login" });
-        location.reload(); // 为了重新实例化vue-router对象 避免bug
-
-        // sessionStorage.removeItem('token')
-        // this.$store.dispatch("setLoginStatus", false); // 设置isRouterAlive为false
-        this.$store.dispatch("setCourseName", "");
-        this.$store.dispatch("setCourseId", "");
-        this.$store.dispatch("setTeacherName", "");
+        this.$confirm("确定要退出登录吗？", "提示", {
+          type: "warning"
+        })
+          .then(() => {
+            sessionStorage.clear();
+            this.$router.replace({ name: "login" });
+            // location.reload(); // 为了重新实例化vue-router对象 避免bug
+            // sessionStorage.removeItem('token')
+            // this.$store.dispatch("setLoginStatus", false); // 设置isRouterAlive为false
+            this.$store.dispatch("setCourseName", "");
+            this.$store.dispatch("setCourseId", "");
+            this.$store.dispatch("setTeacherName", "");
+          })
+          .catch(() => {
+            return;
+          });
       } else if (command === "edit") {
         this.$store.dispatch("setEditInfo", true);
       } else if (command === "pwd") {

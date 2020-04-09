@@ -21,7 +21,7 @@ const api = {
     return req.apiAxios("POST", "/api/student/updategrade", params)
   },
   // 获取某门课所有学生的信息
-  getAllStudentInfo:(params)=>{
+  getAllStudentInfo: (params) => {
     return req.apiAxios("POST", "/api/student/allmessage", params)
   },
   // 获取所有老师列表
@@ -29,12 +29,20 @@ const api = {
     return req.apiAxios('POST', "/api/teacher/allteacher", params)
   },
   // 删除某个老师
-  delTeacher:(params)=>{
-    return req.apiAxios("POST",'/api/teacher/delteacher',params)
+  delTeacher: (params) => {
+    return req.apiAxios("POST", '/api/teacher/delteacher', params)
   },
   // 查看某个老师的详情
-  showTeacherDetail:(params)=>{
-    return req.apiAxios("POST",'/api/teacher/allcourse',params)
+  showTeacherDetail: (params) => {
+    return req.apiAxios("POST", '/api/teacher/allcourse', params)
+  },
+  // 解绑微信
+  unBind: (params) => {
+    return req.apiAxios("POST", '/api/student/uptopenid', params)
+  },
+  // 删除某个学生
+  delStudent: (params) => {
+    return req.apiAxios("POST", "/api/student/delstu", params)
   }
 }
 

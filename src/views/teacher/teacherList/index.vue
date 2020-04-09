@@ -43,6 +43,14 @@ export default {
   created() {
     this.getTeacherList();
   },
+  beforeRouteEnter: (to, from, next) => {
+    // ...
+    if (sessionStorage.getItem("role") !== "admin") {
+      next("/course");
+    } else {
+      next();
+    }
+  },
   methods: {
     pageChange(val) {
       this.layerpageinfo.pageNum = val;

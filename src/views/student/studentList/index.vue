@@ -4,7 +4,21 @@
       <div>
         <el-button type="primary" @click="uploadStudent">批量导入</el-button>
         <el-button type="primary" @click="addStudent">添加单个学生</el-button>
+        <el-input
+          placeholder="请输入内容进行搜索"
+          v-model="search_value"
+          @keydown.enter.native="search_student"
+          class="input-with-select"
+          ref="search_input"
+        >
+          <el-select v-model="select" slot="prepend" @change="clear_search" placeholder="请选择">
+            <el-option label="姓名" value="courseName"></el-option>
+            <el-option label="学号" value="studentNum"></el-option>
+          </el-select>
+          <el-button slot="append" @click="search_student" icon="el-icon-search"></el-button>
+        </el-input>
       </div>
+
       <el-button type="primary" @click="exportList">导出学生信息表</el-button>
     </div>
     <div class="content">
@@ -27,7 +41,11 @@
               @click="studentDetail(scope.row.studentId,scope.row.studentName)"
             >查看详情</el-button>-->
             <el-button type="text" @click="editStudent(scope.$index)">查看详情</el-button>
-            <!-- <el-button type="text" @click="deleteStudent(scope.row.id)">删除</el-button> -->
+            <el-button
+              type="text"
+              style="color:#f56c6c"
+              @click="deleteStudent(scope.row.studentId)"
+            >删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -44,37 +62,28 @@
     >
       <div class="edit">
         <el-form :model="form" ref="form" label-width="100px">
-          <el-form-item label="姓名">
-            <!-- <el-input v-model="form.studentName" class="input_width" disabled></el-input> -->
-            {{form.studentName}}
+          <el-form-item label="姓名:">{{form.studentName}}</el-form-item>
+          <el-form-item label="学号:">{{form.studentNum}}</el-form-item>
+          <el-form-item label="微信绑定状态:">
+            <template>
+              <span style="margin-right:10px;">{{form.openId?'已绑定':'未绑定'}}</span>
+              <el-button type="text" v-if="form.openId" @click="unBind(form.studentNum)">解绑</el-button>
+            </template>
           </el-form-item>
-          <el-form-item label="学号">
-            <!-- <el-input v-model="form.studentId" class="input_width" disabled></el-input> -->
-            {{form.studentNum}}
-          </el-form-item>
-          <el-form-item label="签到情况">
-            <!-- <el-input v-model="form.sign" class="input_width" disabled></el-input> -->
-            {{form.sign||0}}次未签到
-          </el-form-item>
-          <el-form-item label="作业情况">
-            <!-- <el-input v-model="form.homeWork" class="input_width" disabled></el-input> -->
-            {{form.homeWork||0}}次未提交
-          </el-form-item>
-          <el-form-item label="测试情况">
-            <!-- <el-input v-model="form.test" class="input_width" disabled></el-input> -->
-            {{form.test||0}}次未提交
-          </el-form-item>
-          <el-form-item label="平时成绩">
+          <el-form-item label="签到情况:">{{form.sign||0}}次未签到</el-form-item>
+          <el-form-item label="作业情况:">{{form.homeWork||0}}次未提交</el-form-item>
+          <el-form-item label="测试情况:">{{form.test||0}}次未提交</el-form-item>
+          <el-form-item label="平时成绩:">
             <el-input v-model.number="form.regularGrade" @input="change" class="input_width">
               <template slot="append">分</template>
             </el-input>
           </el-form-item>
-          <el-form-item label="考试成绩">
+          <el-form-item label="考试成绩:">
             <el-input v-model.number="form.examGrade" @input="change" class="input_width">
               <template slot="append">分</template>
             </el-input>
           </el-form-item>
-          <el-form-item label="最终成绩">
+          <el-form-item label="最终成绩:">
             <el-input v-model.number="form.finalGrade" @input="change" class="input_width">
               <template slot="append">分</template>
             </el-input>
@@ -131,6 +140,15 @@ export default {
         total: 0
       },
       student_list: [],
+      // 搜索类型选择值
+      select: "courseName",
+      // 搜索框输入内容
+      search_value: "",
+      // 搜索参数
+      search_params: {
+        courseName: "", //根据学生名字进行搜索
+        studentNum: "" //根据学号进行搜索
+      },
       form: {
         name: "",
         number: "",
@@ -163,6 +181,63 @@ export default {
     this.getStudentList();
   },
   methods: {
+    // 切换搜索条件时清理搜索参数
+    clear_search() {
+      this.search_value = "";
+      this.search_params.studentNum = "";
+      this.search_params.courseName = "";
+    },
+    // 搜索学生
+    search_student() {
+      // console.log(this.select, this.search_value);
+      this.search_params[this.select] = this.search_value;
+      this.getStudentList();
+      // 让输入框失去焦点防止用户连续按enter
+      this.$refs.search_input.blur();
+    },
+    // 删除某个学生
+    deleteStudent(studentId) {
+      this.$confirm("确定要删除此学生吗？", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          let obj = {
+            studentId,
+            courseId: this.courseId
+          };
+          let str = JSON.stringify(obj);
+          this.api.delStudent(str).then(res => {
+            if (res.code !== 0) return;
+            this.$message.success("已删除此学生！");
+            this.getStudentList();
+          });
+        })
+        .catch(() => {
+          return;
+        });
+    },
+    // 解绑微信
+    unBind(studentNum) {
+      this.$confirm("确定要给将此学生解除微信绑定吗？", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          let obj = {
+            studentNum
+          };
+          let str = JSON.stringify(obj);
+          this.api.unBind(str).then(res => {
+            if (res.code !== 0) return;
+            this.$message.success("已解绑！");
+            this.form.openId = "";
+            this.getStudentList();
+          });
+        })
+        .catch(() => {
+          return;
+        });
+    },
+    // 表单提交
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -203,14 +278,16 @@ export default {
     // 获取学生列表
     getStudentList() {
       let obj = {
-        courseId: this.courseId
+        courseId: this.courseId,
+        ...this.search_params
       };
       obj = Object.assign({}, obj, this.layerpageinfo);
       let str = JSON.stringify(obj);
       this.api.getCourseInfo(str).then(res => {
         console.log(res);
         if (res.code !== 0) return;
-        let list = res.data.list || [];
+        let data = res.data || {};
+        let list = data.list || [];
         this.student_list = list;
         this.layerpageinfo.total = res.data.courseCount;
       });
@@ -355,9 +432,20 @@ export default {
           }
           return obj;
         });
-         this.common.jsonToXlsx(json, "学生信息表.xlsx");
+        this.common.jsonToXlsx(json, "学生信息表.xlsx");
       });
     }
   }
 };
 </script>
+<style lang="scss">
+.studentList {
+  .el-input-group {
+    width: 300px;
+    margin-left: 15px;
+  }
+  .el-select .el-input {
+    width: 80px;
+  }
+}
+</style>

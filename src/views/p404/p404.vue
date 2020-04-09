@@ -21,7 +21,7 @@
 
 <style lang="scss">
   .img-404{
-    background: url("../../assets/img/404.jpg") center center no-repeat;
+    background: url("https://i1.fuimg.com/714579/5286364504960fe1.png") center center no-repeat;
     height: 560px;
   }
   .btn{

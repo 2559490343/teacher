@@ -1,4 +1,5 @@
-# teacher1
+# teacher
+基于vuejs的课堂辅助系统，结合微信小程序端进行对学生上课的一些辅助操作。
 
 ## Project setup
 ```
